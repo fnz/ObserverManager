@@ -49,6 +49,7 @@ public:
 };
 
 class B : public FooBarProtocol, public TicTacProtocol {
+public:
     virtual void ticTac() override {
         stream << "Tic Tac" << " ";
     }
