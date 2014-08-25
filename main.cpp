@@ -25,12 +25,14 @@ void checkResult(const std::string answer) {
 
 #pragma mark - Sample protocols
 
-struct FooBarProtocol : public BaseObserverProtocol {
+class FooBarProtocol : public BaseObserverProtocol {
+public:
     virtual void foo() {}
     virtual void bar(const std::string& word) {}
 };
 
-struct TicTacProtocol : public BaseObserverProtocol {
+class TicTacProtocol : public BaseObserverProtocol {
+public:
     virtual void ticTac() {}
 };
 
