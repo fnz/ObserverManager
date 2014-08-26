@@ -63,29 +63,31 @@ public:
 void runTest1() {
     // Basic uses
     A* a1 = new A();
-    a1->name = "Mary";
+    a1->name = "Tic";
     ObserverManager::subscribe<FooBarProtocol>(a1);
     
     A* a2 = new A();
-    a2->name = "Jane";
+    a2->name = "Tic";
     ObserverManager::subscribe<FooBarProtocol>(a2);
     
     ObserverManager::notify(&FooBarProtocol::foo);
-    ObserverManager::notify(&FooBarProtocol::bar, "Girls");
+    ObserverManager::notify(&FooBarProtocol::bar, "Tac");
     
     // check deletion
     delete a1;
     
     ObserverManager::notify(&FooBarProtocol::foo);
-    ObserverManager::notify(&FooBarProtocol::bar, "Girls");
+    ObserverManager::notify(&FooBarProtocol::bar, "Tac");
     
     // check unsubscribing
     ObserverManager::unsubscribe(a2);
     
     ObserverManager::notify(&FooBarProtocol::foo);
-    ObserverManager::notify(&FooBarProtocol::bar, "Girls");
+    ObserverManager::notify(&FooBarProtocol::bar, "Tac");
     
-    checkResult("Mary Jane Girls Girls Jane Girls ");
+    checkResult("Tic Tic Tac Tac Tic Tac ");
+
+    delete a2;
 }
 
 void runTest2() {
@@ -165,22 +167,25 @@ void runTest6() {
     // Clear test
     
     A* a1 = new A();
-    a1->name = "Suzy";
+    a1->name = "Tic";
     ObserverManager::subscribe<FooBarProtocol>(a1);
     
     A* a2 = new A();
-    a2->name = "Nelly";
+    a2->name = "Tic";
     ObserverManager::subscribe<FooBarProtocol>(a2);
     
     ObserverManager::notify(&FooBarProtocol::foo);
-    ObserverManager::notify(&FooBarProtocol::bar, "Girls");
+    ObserverManager::notify(&FooBarProtocol::bar, "Tac");
     
     ObserverManager::clear<FooBarProtocol>();
     
     ObserverManager::notify(&FooBarProtocol::foo);
-    ObserverManager::notify(&FooBarProtocol::bar, "Girls");
+    ObserverManager::notify(&FooBarProtocol::bar, "Tac");
     
-    checkResult("Suzy Nelly Girls Girls ");
+    checkResult("Tic Tic Tac Tac ");
+
+    delete a1;
+    delete a2;
 }
 
 void runTest7() {
@@ -189,9 +194,11 @@ void runTest7() {
     A* a = new A();
     ObserverManager::unsubscribe<FooBarProtocol>(a);
     
-    ObserverManager::notify(&FooBarProtocol::bar, "Girls");
+    ObserverManager::notify(&FooBarProtocol::bar, "Tac");
     
     checkResult("");
+
+    delete a;
 }
 
 void runTest8() {
@@ -223,6 +230,8 @@ void runTest(int i) {
 }
 
 void runAllTests() {
+    // Run all tests consequently
+
     for (int i = 1; i < 9; i++) {
         isOK = true;
         clearStream();
@@ -234,7 +243,7 @@ void runAllTests() {
 }
 
 void runAllTestsHardcoreMode() {
-    // Run previous tests i all possible permutations
+    // Run previous tests in all possible permutations
     // to ensure the results are order independent
     
     std::vector<int> ids;
@@ -244,7 +253,7 @@ void runAllTestsHardcoreMode() {
     
     clock_t begin = clock();
     do {
-        for (int i = 0; i < ids.size(); i++) {
+        for (int i = 1; i <= ids.size(); i++) {
             runTest(i);
         }
     } while (std::next_permutation(ids.begin(), ids.end()));
@@ -261,7 +270,7 @@ void runAllTestsHardcoreMode() {
 void runSpeedTest() {
     // Speed test for different stl containers comparison
     int vectorSize = 1000;
-    int loopSize = 10000000;
+    int loopSize = 1000000;
     
     std::vector<A*> aVector(vectorSize, new A());
     srand(0);
@@ -295,7 +304,6 @@ void runSpeedTest() {
 int main(int argc, const char * argv[]) {
     runAllTests();
     runAllTestsHardcoreMode();
-    runSpeedTest();
 }
     
 
