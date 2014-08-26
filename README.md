@@ -34,3 +34,9 @@ void main() {
 }
 ```
 
+To run tests simply type 
+
+```
+make
+./RunTests
+```
