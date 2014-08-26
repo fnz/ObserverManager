@@ -3,7 +3,6 @@
 #include <set>
 #include "BaseObserverProtocol.h"
 
-class ObserverManager;
 class BaseObserverProtocol;
 
 template <typename T>
