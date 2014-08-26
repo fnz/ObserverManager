@@ -267,6 +267,26 @@ void runAllTestsHardcoreMode() {
     std::cout << std::endl;
 }
 
+void runMapSpeedTest() {
+    // Speed test for different map vs unordered_map comparison
+    int vectorSize = 10000000;
+    
+    clock_t begin = clock();
+    std::vector<A*> aVector(vectorSize, new A());
+    for (int i = 0; i < aVector.size(); i++) {
+        ObserverManager::subscribe<FooBarProtocol>(aVector[i]);
+    }
+
+    for (int i = 0; i < aVector.size(); i++) {
+        ObserverManager::unsubscribe(aVector[i]);
+    }
+    clock_t end = clock();
+
+    double elapsed = double(end - begin) / CLOCKS_PER_SEC;
+    std::cout << "Map speed test time: " << elapsed << std::endl;
+    std::cout << std::endl;
+}
+
 void runSpeedTest() {
     // Speed test for different stl containers comparison
     int vectorSize = 1000;
@@ -276,7 +296,6 @@ void runSpeedTest() {
     srand(0);
     
     clock_t begin = clock();
-    
     for (int i = 0; i < loopSize; i++) {
         int choise = rand()%3;
         
@@ -294,8 +313,8 @@ void runSpeedTest() {
                 break;
         }
     }
-    
     clock_t end = clock();
+
     double elapsed = double(end - begin) / CLOCKS_PER_SEC;
     std::cout << "Speed test time: " << elapsed << std::endl;
     std::cout << std::endl;
