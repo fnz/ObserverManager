@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <map>
 #include "ObserverContainer.h"
 #include "BaseObserverProtocol.h"
 
@@ -53,5 +53,5 @@ public:
     }
 
 private:
-    static std::unordered_map<int, void (*)(BaseObserverProtocol*)> unsubscribeMap;
+    static std::map<int, void (*)(BaseObserverProtocol*)> unsubscribeMap;
 };
