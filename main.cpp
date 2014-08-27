@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <thread>
 
 #include "ObserverManager.h"
 
@@ -16,11 +17,10 @@ void clearStream() {
     stream.clear();
 }
 
-void checkResult(const std::string answer) {
-    if (stream.str() != answer) {
-        isOK = false;
-    }
+bool checkResult(const std::string answer) {
+    bool ret = (stream.str() == answer);
     clearStream();
+    return ret;
 }
 
 #pragma mark - Sample protocols
@@ -60,7 +60,7 @@ public:
 
 #pragma mark - Tests
 
-void runTest1() {
+bool runTest1() {
     // Basic uses
     A* a1 = new A();
     a1->name = "Tic";
@@ -84,13 +84,13 @@ void runTest1() {
     
     ObserverManager::notify(&FooBarProtocol::foo);
     ObserverManager::notify(&FooBarProtocol::bar, "Tac");
-    
-    checkResult("Tic Tic Tac Tac Tic Tac ");
 
     delete a2;
+
+    return checkResult("Tic Tic Tac Tac Tic Tac ");
 }
 
-void runTest2() {
+bool runTest2() {
     // Check one class implementing two protocols
     B* b = new B();
     ObserverManager::subscribe<TicTacProtocol>(b);
@@ -99,12 +99,12 @@ void runTest2() {
     ObserverManager::notify(&TicTacProtocol::ticTac);
     ObserverManager::notify(&FooBarProtocol::bar, "Toe");
     
-    checkResult("Tic Tac Toe ");
-    
     delete b;
+
+    return checkResult("Tic Tac Toe ");
 }
 
-void runTest3() {
+bool runTest3() {
     // Check automatic unsubscribing with multiple protocols
     
     B* b = new B();
@@ -116,10 +116,10 @@ void runTest3() {
     ObserverManager::notify(&TicTacProtocol::ticTac);
     ObserverManager::notify(&FooBarProtocol::bar, "Toe");
     
-    checkResult("");
+    return checkResult("");
 }
 
-void runTest4() {
+bool runTest4() {
     // Check manual unsubscribing with multiple protocols
     B* b = new B();
     ObserverManager::subscribe<TicTacProtocol>(b);
@@ -135,12 +135,12 @@ void runTest4() {
     ObserverManager::notify(&TicTacProtocol::ticTac);
     ObserverManager::notify(&FooBarProtocol::bar, "Toe");
     
-    checkResult("Tic Tac Toe Toe ");
-    
     delete b;
+
+    return checkResult("Tic Tac Toe Toe ");
 }
 
-void runTest5() {
+bool runTest5() {
     // Check mixed unsubscribing with multiple protocols
     
     B* b = new B();
@@ -160,10 +160,10 @@ void runTest5() {
     ObserverManager::notify(&TicTacProtocol::ticTac);
     ObserverManager::notify(&FooBarProtocol::bar, "Toe");
     
-    checkResult("Tic Tac Toe Toe ");
+    return checkResult("Tic Tac Toe Toe ");
 }
 
-void runTest6() {
+bool runTest6() {
     // Clear test
     
     A* a1 = new A();
@@ -181,27 +181,27 @@ void runTest6() {
     
     ObserverManager::notify(&FooBarProtocol::foo);
     ObserverManager::notify(&FooBarProtocol::bar, "Tac");
-    
-    checkResult("Tic Tic Tac Tac ");
 
     delete a1;
     delete a2;
+
+    return checkResult("Tic Tic Tac Tac ");
 }
 
-void runTest7() {
+bool runTest7() {
     // Clear test
     
     A* a = new A();
     ObserverManager::unsubscribe<FooBarProtocol>(a);
     
     ObserverManager::notify(&FooBarProtocol::bar, "Tac");
-    
-    checkResult("");
 
     delete a;
+
+    return checkResult("");
 }
 
-void runTest8() {
+bool runTest8() {
     // Bad input test
     
     A* aBad = nullptr;
@@ -213,29 +213,29 @@ void runTest8() {
     ObserverManager::notify(&TicTacProtocol::ticTac);
     ObserverManager::notify(&FooBarProtocol::bar, "Bad");
     
-    checkResult("");
+    return checkResult("");
 }
 
-void runTest(int i) {
+bool runTest(int i) {
     switch (i) {
-        case 1: runTest1(); break;
-        case 2: runTest2(); break;
-        case 3: runTest3(); break;
-        case 4: runTest4(); break;
-        case 5: runTest5(); break;
-        case 6: runTest6(); break;
-        case 7: runTest7(); break;
-        case 8: runTest8(); break;
+        case 1: return runTest1();
+        case 2: return runTest2();
+        case 3: return runTest3();
+        case 4: return runTest4();
+        case 5: return runTest5();
+        case 6: return runTest6();
+        case 7: return runTest7();
+        case 8: return runTest8();
     }
+    return false;
 }
 
 void runAllTests() {
     // Run all tests consequently
 
     for (int i = 1; i < 9; i++) {
-        isOK = true;
         clearStream();
-        runTest(i);
+        bool isOK = runTest(i);
         std::cout << "Test " << std::to_string(i) << ": ";
         std::cout << (isOK ? "OK" : "FAIL") << std::endl;
     }
@@ -320,9 +320,40 @@ void runSpeedTest() {
     std::cout << std::endl;
 }
 
+void runThreadTest() {
+    const int nThreads = 100;
+    const int toWait = 5;
+
+    auto threadFunction = [](){
+        A* a = new A();
+        ObserverManager::subscribe<FooBarProtocol>(a);
+    };
+
+    for (int i = 0; i < nThreads; i++) {
+        std::thread t(threadFunction);
+        t.detach();
+    }
+
+    std::this_thread::sleep_for(std::chrono::seconds(toWait));
+
+    ObserverManager::notify(&FooBarProtocol::bar, "Ha");
+    std::stringstream resultStream;
+    for (int i = 0; i < nThreads; i++) {
+        resultStream << "Ha ";
+    }
+    std::string result = resultStream.str();
+
+    bool isOK = checkResult(result);
+    std::cout << "Thread test: ";
+    std::cout << (isOK ? "OK" : "FAIL") << std::endl;
+
+    ObserverManager::clear<FooBarProtocol>();
+}
+
 int main(int argc, const char * argv[]) {
     runAllTests();
     runAllTestsHardcoreMode();
+    runThreadTest();
 }
     
 

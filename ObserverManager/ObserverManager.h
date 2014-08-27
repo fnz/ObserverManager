@@ -11,26 +11,9 @@ public:
         if (!observer) {
             return;
         }
+        std::unique_lock<std::mutex> lock(unsubscribeMapMutex);
         unsubscribeMap[observer->T::observerId] = &ObserverContainer<T>::removeObserver;
         ObserverContainer<T>::addObserver(static_cast<T*>(observer));
-    }
-
-    template <class T>
-    static void notify(void (T::*method)()) {
-        auto currentObservers = ObserverContainer<T>::observers;
-        for (auto observer : currentObservers) {
-            (observer->*method)();
-        }
-    }
-
-    // to disambiguate a call to overloaded member function
-    // use notify(static_cast<void (Class::*)(T1, T2, ...)>(&Class::method), arg1, arg2, ...);
-    template <typename T, typename... MethodArgumentTypes, typename... ActualArgumentTypes>
-    static void notify(void (T::*method)(MethodArgumentTypes...), ActualArgumentTypes... args) {
-        auto currentObservers = ObserverContainer<T>::observers;
-        for (auto observer : currentObservers) {
-            (observer->*method)(args...);
-        }
     }
 
     template <class T>
@@ -38,6 +21,7 @@ public:
         if (!observer) {
             return;
         }
+        std::unique_lock<std::mutex> lock(unsubscribeMapMutex);
         if (unsubscribeMap.find(observer->T::observerId) == std::end(unsubscribeMap)) {
             return;
         }
@@ -52,6 +36,25 @@ public:
         return ObserverContainer<T>::clear();
     }
 
+    template <class T>
+    static void notify(void (T::*method)()) {
+        auto currentObservers = ObserverContainer<T>::getObservers();
+        for (auto observer : currentObservers) {
+            (observer->*method)();
+        }
+    }
+
+    // to disambiguate a call to overloaded member function
+    // use notify(static_cast<void (Class::*)(T1, T2, ...)>(&Class::method), arg1, arg2, ...);
+    template <typename T, typename... MethodArgumentTypes, typename... ActualArgumentTypes>
+    static void notify(void (T::*method)(MethodArgumentTypes...), ActualArgumentTypes... args) {
+        auto currentObservers = ObserverContainer<T>::getObservers();
+        for (auto observer : currentObservers) {
+            (observer->*method)(args...);
+        }
+    }
+
 private:
     static std::map<int, void (*)(BaseObserverProtocol*)> unsubscribeMap;
+    static std::mutex unsubscribeMapMutex;
 };
