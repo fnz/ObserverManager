@@ -10,7 +10,6 @@
 #pragma mark - Aux
 
 std::stringstream stream;
-bool isOK;
 
 void clearStream() {
     stream.str(std::string());
@@ -252,9 +251,10 @@ void runAllTestsHardcoreMode() {
     }
     
     clock_t begin = clock();
+    bool isOK = true;
     do {
         for (int i = 1; i <= ids.size(); i++) {
-            runTest(i);
+            isOK &= runTest(i);
         }
     } while (std::next_permutation(ids.begin(), ids.end()));
     clock_t end = clock();
@@ -268,7 +268,7 @@ void runAllTestsHardcoreMode() {
 }
 
 void runMapSpeedTest() {
-    // Speed test for different map vs unordered_map comparison
+    // Speed test for map vs unordered_map comparison
     int vectorSize = 10000000;
     
     clock_t begin = clock();
@@ -321,6 +321,8 @@ void runSpeedTest() {
 }
 
 void runThreadTest() {
+	// Simple test for multithreading support
+
     const int nThreads = 100;
     const int toWait = 5;
 
