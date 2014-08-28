@@ -3,7 +3,7 @@ ObserverManager
 
 Generalized observer pattern based on C++11 variadic templates. An observer can be subscribed to different groups of events. All observers are automatically unsubscribed when destructor is called. Parametrized events are supported with unlimited number of arguments.
 
-Sample use:
+Here's a sample use:
 
 ```
 class FooBarProtocol : public BaseObserverProtocol {
