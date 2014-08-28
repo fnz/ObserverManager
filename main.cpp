@@ -337,6 +337,9 @@ void runThreadTest() {
             ObserverManager::subscribe<FooBarProtocol>(a);
         }
         for (auto a : v) {
+            ObserverManager::unsubscribe(a);
+        }
+        for (auto a : v) {
             delete a;
         }
     };
