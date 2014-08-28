@@ -323,12 +323,22 @@ void runSpeedTest() {
 void runThreadTest() {
 	// Simple test for multithreading support
 
-    const int nThreads = 100;
+    const int nThreads = 10;
     const int toWait = 5;
 
     auto threadFunction = [](){
-        A* a = new A();
-        ObserverManager::subscribe<FooBarProtocol>(a);
+        std::vector<A*> v;
+        for (int i = 0; i < 100; i++) {
+            A* a = new A();
+            v.push_back(a);
+        }
+
+        for (auto a : v) {
+            ObserverManager::subscribe<FooBarProtocol>(a);
+        }
+        for (auto a : v) {
+            delete a;
+        }
     };
 
     for (int i = 0; i < nThreads; i++) {
@@ -339,13 +349,8 @@ void runThreadTest() {
     std::this_thread::sleep_for(std::chrono::seconds(toWait));
 
     ObserverManager::notify(&FooBarProtocol::bar, "Ha");
-    std::stringstream resultStream;
-    for (int i = 0; i < nThreads; i++) {
-        resultStream << "Ha ";
-    }
-    std::string result = resultStream.str();
 
-    bool isOK = checkResult(result);
+    bool isOK = checkResult("");
     std::cout << "Thread test: ";
     std::cout << (isOK ? "OK" : "FAIL") << std::endl;
 
