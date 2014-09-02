@@ -34,6 +34,10 @@ void main() {
 
 	ObserverManager::notify(&FooBarProtocol::foo);
 	ObserverManager::notify(&FooBarProtocol::bar, "Poppins");
+
+	ObserverManager::unsubscribe(a);
+
+	delete a;
 }
 ```
 
