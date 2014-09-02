@@ -19,11 +19,11 @@ public:
 	std::string name;
 	
 	virtual void foo() override {
-		stream << name << " ";
+		std::cout << name << " ";
 	}
 
 	virtual void bar(const std::string& word) override {
-		stream << word << " ";
+		std::cout << word << " ";
 	}
 };
 
