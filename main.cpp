@@ -320,44 +320,85 @@ void runSpeedTest() {
     std::cout << std::endl;
 }
 
-void runThreadTest() {
+class ThreadTestProtocol : public BaseObserverProtocol {
+public:
+    virtual void call(const int x) {};
+};
+
+class C : public ThreadTestProtocol {
+public:
+    int x;
+    static int marks[10];
+    virtual void call(const int x) override {
+        if (this->x != x) {
+            return;
+        }
+        if (x < 0 || x > 9) {
+            return;
+        }
+        marks[x]++;
+    };
+};
+
+int C::marks[10];
+
+bool runThreadTestSingle() {
 	// Simple test for multithreading support
 
     const int nThreads = 10;
-    const int toWait = 5;
-
-    auto threadFunction = [](){
-        std::vector<A*> v;
-        for (int i = 0; i < 100; i++) {
-            A* a = new A();
-            v.push_back(a);
+    const int nObservers = 10;
+    const int nObservers2 = nObservers*nObservers;
+    
+    auto threadFunction = [](const int x){
+        std::vector<C*> v;
+        for (int i = 0; i < nObservers; i++) {
+            C* c = new C();
+            c->x = x;
+            v.push_back(c);
         }
 
-        for (auto a : v) {
-            ObserverManager::subscribe<FooBarProtocol>(a);
+        for (auto& c : v) {
+            ObserverManager::subscribe<ThreadTestProtocol>(c);
+            ObserverManager::notify(&ThreadTestProtocol::call, x);
         }
-        for (auto a : v) {
-            ObserverManager::unsubscribe(a);
+        
+        for (auto& c : v) {
+            ObserverManager::unsubscribe(c);
+            ObserverManager::notify(&ThreadTestProtocol::call, x);
         }
-        for (auto a : v) {
+        for (auto& a : v) {
             delete a;
         }
     };
-
+    
+    memset(C::marks, 0, sizeof(C::marks));
+    
+    std::vector<std::thread> threads;
     for (int i = 0; i < nThreads; i++) {
-        std::thread t(threadFunction);
-        t.detach();
+        threads.push_back(std::thread(threadFunction, i));
+    }
+    
+    for (auto& t : threads) {
+        t.join();
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(toWait));
+    bool isOK = true;
+    for (int i = 0; i < 10; i++) {
+        isOK &= (C::marks[i] == nObservers2);
+    }
+    
+    return isOK;
+}
 
-    ObserverManager::notify(&FooBarProtocol::bar, "Ha");
-
-    bool isOK = checkResult("");
+void runThreadTest() {
+    bool isOK = true;
+    const int nRuns = 100;
+    for (int i = 0; i < nRuns; i++) {
+        isOK &= runThreadTestSingle();
+    }
+    
     std::cout << "Thread test: ";
     std::cout << (isOK ? "OK" : "FAIL") << std::endl;
-
-    ObserverManager::clear<FooBarProtocol>();
 }
 
 int main(int argc, const char * argv[]) {
