@@ -1,7 +1,9 @@
 ObserverManager
 ===============
 
-Generalized observer pattern based on C++11 variadic templates. An observer can be subscribed to different groups of events. All observers are automatically unsubscribed when destructor is called. Parametrized events are supported with unlimited number of arguments.
+Generalized observer pattern based on C++11 variadic templates with thread safety.
+
+An observer can be subscribed to different groups of events. All observers are automatically unsubscribed when destructor is called. Parametrized events are supported with unlimited number of arguments.
 
 Here's a sample use:
 
@@ -18,7 +20,8 @@ public:
 	
 	virtual void foo() override {
 		stream << name << " ";
-	};
+	}
+
 	virtual void bar(const std::string& word) override {
 		stream << word << " ";
 	}
@@ -30,7 +33,7 @@ void main() {
 	ObserverManager::subscribe<FooBarProtocol>(a);
 
 	ObserverManager::notify(&FooBarProtocol::foo);
-	ObserverManager::notify(&FooBarProtocol::bar, "Jane");
+	ObserverManager::notify(&FooBarProtocol::bar, "Poppins");
 }
 ```
 
