@@ -1,13 +1,4 @@
-ObserverManager
-===============
-
-Generalized observer pattern based on C++11 variadic templates.
-
-This implementation of the Observer pattern allows you to group events in interfaces (further called protocols) with the ability to parametrize them as you like. A single observer can be subscribed to different groups of events simultaneously. All observers are automatically unsubscribed when their destructor is called, so no memory issues will arise. Observers are passed to manager as pointers, shared pointers are supported as well.
-
-Here's a sample use:
-
-```
+#include <gtest/gtest.h>
 #include <iostream>
 
 #include "ObserverManager.h"
@@ -29,7 +20,7 @@ public:
 	}
 };
 
-int main() {
+TEST(ObserverManager, Jim) {
 	Worker* jim = new Worker();
 	ObserverManager::subscribe<MoneyProtocol>(jim);
 
@@ -40,10 +31,3 @@ int main() {
 
 	delete jim;
 }
-```
-
-To run tests:
-
-```
-./run_tests.sh
-```
