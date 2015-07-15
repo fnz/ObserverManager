@@ -7,8 +7,6 @@
 #include "ObserverContainer.h"
 #include "BaseObserverProtocol.h"
 
-#include <iostream>
-
 class ObserverManager {
 public:
     // P stands for current protocol (a group of parametrized events)
