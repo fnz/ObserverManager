@@ -42,8 +42,9 @@ int main() {
 }
 ```
 
-To run tests:
+To clone and run tests:
 
 ```
+git clone --recursive https://github.com/fnz/ObserverManager.git
 ./run_tests.sh
 ```
