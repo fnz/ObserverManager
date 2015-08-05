@@ -46,5 +46,6 @@ To clone and run tests:
 
 ```
 git clone --recursive https://github.com/fnz/ObserverManager.git
+cd ObserverManager
 ./run_tests.sh
 ```
