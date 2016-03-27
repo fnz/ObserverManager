@@ -1,9 +1,22 @@
 #pragma once
 
+#include <cstdint>
+
 class BaseObserverProtocol {
+    friend class ObserverManager;
+
 public:
     BaseObserverProtocol();
+    BaseObserverProtocol(const BaseObserverProtocol&);
+    BaseObserverProtocol(BaseObserverProtocol&&);
+    BaseObserverProtocol& operator=(const BaseObserverProtocol&);
+    BaseObserverProtocol& operator=(BaseObserverProtocol&&);
     virtual ~BaseObserverProtocol();
 
-    unsigned int observerId;
+private:
+    void setNextObserverId();
+
+private:
+    using id_t = uint64_t;
+    id_t observerId;
 };

@@ -1,9 +1,8 @@
+#include "ObserverManager.h"
+#include "TestProtocols.h"
+
 #include <gtest/gtest.h>
 #include <sstream>
-#include <memory>
-
-#include "ObserverManager.h"
-#include "SampleProtocols.h"
 
 // Some basic use cases
 TEST(ObserverManager, Basic) {
@@ -17,12 +16,16 @@ TEST(ObserverManager, Basic) {
     
     ObserverManager::notify(&FooBarProtocol::foo);
     ObserverManager::notify(&FooBarProtocol::bar, "Tac");
+
+    EXPECT_EQ("Tic Tic Tac Tac ", out.str());
     
     // Check deletion
     delete a1;
     
     ObserverManager::notify(&FooBarProtocol::foo);
     ObserverManager::notify(&FooBarProtocol::bar, "Tac");
+
+    EXPECT_EQ("Tic Tic Tac Tac Tic Tac ", out.str());
     
     // Check unsubscribing
     ObserverManager::unsubscribe(a2);

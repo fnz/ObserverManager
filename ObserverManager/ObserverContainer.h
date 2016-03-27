@@ -1,16 +1,15 @@
 #pragma once
 
-#include <set>
 #include "BaseObserverProtocol.h"
 
-class BaseObserverProtocol;
+#include <unordered_set>
 
 template <typename T>
 class ObserverContainer {
     friend class ObserverManager;
 
 private:
-    static std::set<T*> observers;
+    static std::unordered_set<T*> observers;
 
     static void addObserver(T* obs) {
         observers.insert(obs);
@@ -26,4 +25,4 @@ private:
 };
 
 template <typename T>
-std::set<T*> ObserverContainer<T>::observers;
+std::unordered_set<T*> ObserverContainer<T>::observers;

@@ -1,6 +1,6 @@
-#include <ostream>
-
 #include "ObserverManager.h"
+
+#include <ostream>
 
 class FooBarProtocol : public BaseObserverProtocol {
 public:
@@ -15,8 +15,17 @@ public:
 
 class StreamWriter {
 public: 
-    StreamWriter(std::ostream& outStream) :
-    stream(outStream) {}
+    StreamWriter(std::ostream& outStream)
+        : stream(outStream) {
+    }
+
+    StreamWriter(const StreamWriter& sw)
+        : stream(sw.stream) {
+    }
+
+    StreamWriter& operator=(const StreamWriter& sw) {
+        return *this;
+    }
 
 protected:
     std::ostream& stream;
@@ -24,9 +33,10 @@ protected:
 
 class A : StreamWriter, public FooBarProtocol {
 public:
-    A(std::ostream& outStream, const std::string& objName) :
-    StreamWriter(outStream), 
-    name(objName) {}
+    A(std::ostream& outStream, const std::string& objName)
+        : StreamWriter(outStream)
+        , name(objName) {
+    }
     
     virtual void foo() override {
         stream << name << " ";
@@ -35,7 +45,7 @@ public:
         stream << word << " ";
     }
 
-private:
+public:
     std::string name;
 };
 

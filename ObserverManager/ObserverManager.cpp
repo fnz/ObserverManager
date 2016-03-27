@@ -1,3 +1,3 @@
 #include "ObserverManager.h"
 
-std::map<int, void (*)(BaseObserverProtocol*)> ObserverManager::unsubscribeMap;
+std::unordered_map<BaseObserverProtocol::id_t, void (*)(BaseObserverProtocol*)> ObserverManager::unsubscribeMap;
