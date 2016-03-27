@@ -7,7 +7,7 @@ This implementation of the Observer pattern allows you to group events in interf
 
 Here's a sample use:
 
-```
+```cpp
 #include <iostream>
 
 #include "ObserverManager.h"
